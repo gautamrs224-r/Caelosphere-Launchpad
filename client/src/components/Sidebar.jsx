@@ -5,6 +5,7 @@ import {
   Download, Settings, Crown, ChevronDown, LogOut,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -20,9 +21,11 @@ const navItems = [
 export default function Sidebar({ open, onClose }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const toast = useToast();
   const [menuOpen, setMenuOpen] = useState(false);
 
   function handleLogout() {
+    toast({ message: "Logged out. See you soon! 👋", type: "info" });
     logout();
     navigate("/login");
   }

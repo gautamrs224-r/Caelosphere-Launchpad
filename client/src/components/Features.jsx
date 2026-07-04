@@ -54,7 +54,7 @@ export default function Features() {
           <Sparkles size={18} className="text-primary" />
           <span>And More to<br />Accelerate Your Journey</span>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 flex-1">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 flex-1">
           {more.map((m) => (
             <div key={m.title} className="flex items-start gap-2">
               <div className="w-9 h-9 rounded-btn bg-surface2 flex items-center justify-center text-primary flex-shrink-0">

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, MoreHorizontal, Loader2 } from "lucide-react";
+import { Plus, MoreHorizontal } from "lucide-react";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import { projects as projectsApi } from "../../lib/api";
+import { SkeletonProjectCard } from "../../components/Skeleton";
 
 const ICONS = ["🚀", "💡", "📈", "🌱", "🛒", "🎓", "❤️", "💬"];
 const COLORS = [
@@ -47,8 +48,8 @@ export default function Projects() {
   return (
     <DashboardLayout title="Projects" subtitle="All your startups in one place." action={action}>
       {loading && (
-        <div className="flex items-center justify-center gap-2 text-textSecondary py-24">
-          <Loader2 size={18} className="animate-spin" /> Loading your projects...
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[1,2,3].map((i) => <SkeletonProjectCard key={i} />)}
         </div>
       )}
 

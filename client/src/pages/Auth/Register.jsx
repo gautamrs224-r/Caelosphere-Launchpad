@@ -4,6 +4,7 @@ import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import AuthLayout from "./AuthLayout";
 import { Brain, Rocket, BarChart3 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
 
 const perks = [
   { icon: Brain, title: "AI-Powered Insights", desc: "Validate ideas, analyze markets, and discover opportunities." },
@@ -14,6 +15,7 @@ const perks = [
 export default function Register() {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const toast = useToast();
   const [showPw, setShowPw] = useState(false);
   const [showPw2, setShowPw2] = useState(false);
   const [error, setError] = useState("");
@@ -36,6 +38,7 @@ export default function Register() {
     setLoading(true);
     try {
       await register(form.name, form.email, form.password);
+      toast({ message: "Account created! Welcome to Caelosphere 🚀", type: "success" });
       navigate("/dashboard");
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");

@@ -4,12 +4,14 @@ import { Rocket, FileText, BarChart3, Target, Users, Sparkles, Pencil, ArrowLeft
 import WizardLayout from "./WizardLayout";
 import { teamMembers } from "../../../data/dummy";
 import { projects as projectsApi } from "../../../lib/api";
+import { useToast } from "../../../context/ToastContext";
 
 export default function Step5({ data }) {
   const navigate = useNavigate();
   const goals = data.goals || [];
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const toast = useToast();
 
   async function handleCreate() {
     setError("");
@@ -25,6 +27,7 @@ export default function Step5({ data }) {
       };
       const res = await projectsApi.create(payload);
       const newProject = res.data;
+      toast({ message: `"${newProject.title}" created! Running AI analysis... ✨`, type: "success", duration: 5000 });
       navigate(`/launchpad/generating?projectId=${newProject._id}`);
     } catch (err) {
       setError(err.message || "Could not create your startup. Please try again.");

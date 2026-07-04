@@ -1,5 +1,6 @@
 import { HashRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { ToastProvider } from "./context/ToastContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Landing from "./pages/Landing/Landing";
 import Login from "./pages/Auth/Login";
@@ -14,8 +15,9 @@ import Settings from "./pages/Settings/Settings";
 
 export default function App() {
   return (
-    <AuthProvider>
-      <HashRouter>
+    <ToastProvider>
+      <AuthProvider>
+        <HashRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
@@ -45,6 +47,7 @@ export default function App() {
           <Route path="*" element={<PlaceholderPage title="Not Found" subtitle="This page doesn't exist." icon="🚀" emptyTitle="Page Not Found" emptyDesc="Let's get you back on track." />} />
         </Routes>
       </HashRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </ToastProvider>
   );
 }

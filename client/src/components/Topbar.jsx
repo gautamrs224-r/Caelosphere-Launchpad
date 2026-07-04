@@ -1,7 +1,7 @@
 import { Menu, Search, Bell, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export default function Topbar({ onMenuClick, title, subtitle, action }) {
+export default function Topbar({ onMenuClick, title, subtitle, action, onSearchClick }) {
   const navigate = useNavigate();
   return (
     <div className="flex items-center justify-between gap-4 px-6 lg:px-8 py-5 border-b border-border">
@@ -15,11 +15,14 @@ export default function Topbar({ onMenuClick, title, subtitle, action }) {
             {subtitle && <p className="text-sm text-textSecondary truncate">{subtitle}</p>}
           </div>
         ) : (
-          <div className="hidden md:flex items-center gap-2 bg-surface border border-border rounded-btn px-3.5 py-2.5 w-full max-w-sm text-textSecondary text-sm flex-shrink-0">
+          <button
+            onClick={onSearchClick}
+            className="hidden md:flex items-center gap-2 bg-surface border border-border rounded-btn px-3.5 py-2.5 w-full max-w-sm text-textSecondary text-sm cursor-pointer hover:border-primary/50 transition-colors"
+          >
             <Search size={16} className="flex-shrink-0" />
-            <input placeholder="Search anything..." className="bg-transparent outline-none flex-1 min-w-0 text-textPrimary placeholder:text-textSecondary" />
+            <span className="flex-1 text-left">Search anything...</span>
             <span className="text-xs border border-border rounded px-1.5 py-0.5 flex-shrink-0 whitespace-nowrap">Ctrl K</span>
-          </div>
+          </button>
         )}
       </div>
       <div className="flex items-center gap-3 flex-shrink-0">

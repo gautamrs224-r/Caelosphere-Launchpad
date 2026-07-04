@@ -4,6 +4,7 @@ import { FolderOpen, FileText, TrendingUp, Download, Plus, Sparkles, BarChart3, 
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import StatCard from "../../components/StatCard";
+import { SkeletonCard, SkeletonRow } from "../../components/Skeleton";
 import { activityData, industries } from "../../data/dummy";
 import { projects as projectsApi } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
@@ -77,8 +78,8 @@ export default function Dashboard() {
           </div>
 
           {loading && (
-            <div className="flex items-center justify-center gap-2 text-textSecondary py-10 text-sm">
-              <Loader2 size={16} className="animate-spin" /> Loading...
+            <div className="flex flex-col divide-y divide-border">
+              {[1,2,3].map((i) => <SkeletonRow key={i} />)}
             </div>
           )}
 

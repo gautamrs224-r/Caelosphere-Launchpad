@@ -3,10 +3,12 @@ import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import AuthLayout, { defaultPerks } from "./AuthLayout";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
 
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const toast = useToast();
   const [showPw, setShowPw] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -18,6 +20,7 @@ export default function Login() {
     setLoading(true);
     try {
       await login(form.email, form.password);
+      toast({ message: "Welcome back! 👋", type: "success" });
       navigate("/dashboard");
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");

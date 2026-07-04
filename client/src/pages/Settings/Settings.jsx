@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { User, Lock, Palette, Bell } from "lucide-react";
 import DashboardLayout from "../../layouts/DashboardLayout";
+import { useToast } from "../../context/ToastContext";
 
 const tabs = [
   { key: "profile", label: "Profile", icon: User },
@@ -11,6 +12,7 @@ const tabs = [
 
 export default function Settings() {
   const [active, setActive] = useState("profile");
+  const toast = useToast();
   return (
     <DashboardLayout title="Settings" subtitle="Manage your account preferences.">
       <div className="grid lg:grid-cols-4 gap-6">
@@ -45,7 +47,7 @@ export default function Settings() {
                   <input defaultValue="alex@example.com" className="w-full bg-surface2 border border-border rounded-btn px-3.5 py-2.5 text-sm outline-none focus:border-primary" />
                 </div>
               </div>
-              <button className="bg-primary hover:bg-primaryHover text-white text-sm font-medium px-5 py-2.5 rounded-btn mt-6">Save Changes</button>
+              <button onClick={() => toast({ message: "Profile saved!", type: "success" })} className="bg-primary hover:bg-primaryHover text-white text-sm font-medium px-5 py-2.5 rounded-btn mt-6">Save Changes</button>
             </div>
           )}
           {active === "password" && (
@@ -56,7 +58,7 @@ export default function Settings() {
                 <input type="password" placeholder="New password" className="bg-surface2 border border-border rounded-btn px-3.5 py-2.5 text-sm outline-none focus:border-primary" />
                 <input type="password" placeholder="Confirm new password" className="bg-surface2 border border-border rounded-btn px-3.5 py-2.5 text-sm outline-none focus:border-primary" />
               </div>
-              <button className="bg-primary hover:bg-primaryHover text-white text-sm font-medium px-5 py-2.5 rounded-btn mt-6">Update Password</button>
+              <button onClick={() => toast({ message: "Password updated!", type: "success" })} className="bg-primary hover:bg-primaryHover text-white text-sm font-medium px-5 py-2.5 rounded-btn mt-6">Update Password</button>
             </div>
           )}
           {active === "theme" && (

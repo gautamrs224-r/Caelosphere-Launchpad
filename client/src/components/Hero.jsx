@@ -23,7 +23,7 @@ export default function Hero() {
           <span className="inline-flex items-center gap-2 text-xs font-medium text-primary border border-primary/40 rounded-full px-3 py-1.5 mb-6">
             <Sparkles size={14} /> AI-Powered Startup Operating System
           </span>
-          <h1 className="text-5xl md:text-6xl lg:text-[64px] font-extrabold leading-[1.08] mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] font-extrabold leading-[1.1] mb-6">
             Turn Your Startup Idea Into a <span className="text-primary">Launch Plan</span>
           </h1>
           <p className="text-textSecondary text-lg mb-8 max-w-md">

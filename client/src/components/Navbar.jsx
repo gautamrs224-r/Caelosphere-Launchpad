@@ -49,10 +49,10 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-bg/80 backdrop-blur-md border-b border-border/60">
-      <div className="max-w-container mx-auto px-6 h-20 grid grid-cols-[auto_1fr_auto] md:grid-cols-3 items-center gap-4">
+      <div className="max-w-container mx-auto px-6 h-20 grid grid-cols-[auto_1fr_auto] lg:grid-cols-3 items-center gap-4">
         <Logo />
 
-        <nav className="hidden md:flex items-center justify-center gap-8 text-sm text-textSecondary">
+        <nav className="hidden lg:flex items-center justify-center gap-6 xl:gap-8 text-sm text-textSecondary">
           {links.map((l) => (
             <button key={l.label} onClick={() => scrollToSection(l.id)} className="hover:text-textPrimary transition-colors whitespace-nowrap">
               {l.label}
@@ -86,7 +86,7 @@ export default function Navbar() {
           </div>
         </nav>
 
-        <div className="hidden md:flex items-center justify-end gap-4">
+        <div className="hidden lg:flex items-center justify-end gap-4">
           <button onClick={() => navigate("/login")} className="text-sm text-textSecondary hover:text-textPrimary transition-colors whitespace-nowrap">Log in</button>
           <button
             onClick={() => navigate("/register")}
@@ -96,13 +96,13 @@ export default function Navbar() {
           </button>
         </div>
 
-        <button className="md:hidden justify-self-end" onClick={() => setOpen(!open)}>
+        <button className="lg:hidden col-start-3 justify-self-end text-textPrimary flex-shrink-0" onClick={() => setOpen(!open)}>
           {open ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-border px-6 py-4 flex flex-col gap-4 bg-bg">
+        <div className="lg:hidden border-t border-border px-6 py-4 flex flex-col gap-4 bg-bg">
           {links.map((l) => (
             <button key={l.label} onClick={() => { scrollToSection(l.id); setOpen(false); }} className="text-left text-textSecondary">
               {l.label}

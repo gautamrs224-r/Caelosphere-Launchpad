@@ -12,6 +12,8 @@ import MvpTab from "./tabs/MvpTab";
 import BrandingTab from "./tabs/BrandingTab";
 import RoadmapTab from "./tabs/RoadmapTab";
 import { projects as projectsApi, reports as reportsApi } from "../../lib/api";
+import { useToast } from "../../context/ToastContext";
+import { downloadMarkdown, downloadPDF } from "../../lib/exportUtils";
 
 const tabs = [
   { key: "home", label: "Home" },
@@ -25,10 +27,9 @@ const tabs = [
   { key: "roadmap", label: "Roadmap" },
 ];
 
-// Tabs whose content actually comes from the real Gemini report.
-// Branding and Roadmap aren't generated yet, so they keep their own
-// static placeholder content regardless of report state.
-const AI_TABS = ["validation", "competitors", "swot", "leancanvas", "mvp"];
+// All 7 tabs now have real Gemini generators — show the "Run AI Analysis"
+// prompt for any of them if no report exists yet.
+const AI_TABS = ["validation", "competitors", "swot", "leancanvas", "mvp", "branding", "roadmap"];
 
 export default function Workspace() {
   const { id } = useParams();
@@ -42,6 +43,9 @@ export default function Workspace() {
   const [error, setError] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState("");
+  const [exportOpen, setExportOpen] = useState(false);
+
+  const toast = useToast();
 
   const loadAll = useCallback(() => {
     if (!id) return;
@@ -70,12 +74,20 @@ export default function Workspace() {
       setReport(res.data);
       const refreshed = await projectsApi.get(id);
       setProject(refreshed.data);
+      toast({ message: "AI analysis complete! ✨", type: "success" });
     } catch (err) {
       setAnalyzeError(err.message || "AI analysis failed.");
+      toast({ message: err.message || "AI analysis failed.", type: "error" });
     } finally {
       setAnalyzing(false);
     }
   }
+
+  useEffect(() => {
+    function close(e) { setExportOpen(false); }
+    if (exportOpen) document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, [exportOpen]);
 
   if (active === "home") {
     return <WorkspaceHome onOpenTab={setActive} />;
@@ -104,7 +116,7 @@ export default function Workspace() {
   const displayScore = project?.startupScore ?? "—";
 
   const action = (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 relative">
       <button className="border border-border hover:bg-surface2 transition-colors text-sm font-medium px-3.5 py-2 rounded-btn flex items-center gap-1.5">
         <Share2 size={15} /> Share
       </button>
@@ -116,9 +128,31 @@ export default function Workspace() {
         {analyzing ? <RefreshCw size={15} className="animate-spin" /> : <Sparkles size={15} />}
         {analyzing ? "Analyzing..." : report ? "Run New Analysis" : "Run AI Analysis"}
       </button>
-      <button className="border border-border hover:bg-surface2 transition-colors text-sm font-medium px-3.5 py-2 rounded-btn flex items-center gap-1.5">
-        <Download size={15} /> Export
-      </button>
+      <div className="relative">
+        <button
+          onClick={() => setExportOpen((v) => !v)}
+          disabled={!report}
+          className="border border-border hover:bg-surface2 transition-colors text-sm font-medium px-3.5 py-2 rounded-btn flex items-center gap-1.5 disabled:opacity-40"
+        >
+          <Download size={15} /> Export
+        </button>
+        {exportOpen && (
+          <div className="absolute right-0 top-full mt-1.5 bg-surface border border-border rounded-card shadow-soft w-44 z-50 py-1 overflow-hidden">
+            <button
+              onClick={() => { downloadMarkdown(project, report); setExportOpen(false); toast({ message: "Markdown exported!", type: "success" }); }}
+              className="w-full text-left px-4 py-2.5 text-sm hover:bg-surface2 transition-colors"
+            >
+              📄 Markdown (.md)
+            </button>
+            <button
+              onClick={() => { downloadPDF(project, report); setExportOpen(false); toast({ message: "PDF opened in print dialog!", type: "success" }); }}
+              className="w-full text-left px-4 py-2.5 text-sm hover:bg-surface2 transition-colors"
+            >
+              🖨️ PDF (Print)
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -174,8 +208,8 @@ export default function Workspace() {
           {active === "swot" && <SwotTab data={report?.swot} />}
           {active === "leancanvas" && <LeanCanvasTab data={report?.leanCanvas} />}
           {active === "mvp" && <MvpTab data={report?.mvpPlan} />}
-          {active === "branding" && <BrandingTab />}
-          {active === "roadmap" && <RoadmapTab />}
+          {active === "branding" && <BrandingTab data={report?.branding} />}
+          {active === "roadmap" && <RoadmapTab data={report?.roadmap} />}
         </>
       )}
     </DashboardLayout>

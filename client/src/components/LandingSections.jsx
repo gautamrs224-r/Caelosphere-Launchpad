@@ -26,7 +26,7 @@ export function HowItWorks() {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-4 gap-6 mb-14">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-14">
         {howItWorks.map((s, i) => {
           const Icon = stepIcons[i];
           return (
@@ -49,7 +49,7 @@ export function HowItWorks() {
                 <p className="text-sm text-textSecondary">{s.desc}</p>
               </div>
               {i < 3 && (
-                <ChevronRight className="hidden md:block absolute top-1/2 -right-6 -translate-y-1/2 text-primary/60" size={20} />
+                <ChevronRight className="hidden lg:block absolute top-1/2 -right-6 -translate-y-1/2 text-primary/60" size={20} />
               )}
             </motion.div>
           );
@@ -61,7 +61,7 @@ export function HowItWorks() {
           <p className="font-semibold">Built for Founders.</p>
           <p className="text-primary font-semibold">Powered by AI.</p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 flex-1">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 flex-1">
           {badges.map((b) => (
             <div key={b.title} className="flex items-start gap-2">
               <div className="w-9 h-9 rounded-full bg-surface2 flex items-center justify-center text-primary flex-shrink-0">
@@ -88,7 +88,7 @@ export function Testimonials() {
         </span>
         <h2 className="text-3xl md:text-4xl font-bold">Built for Founders. Loved by Thousands.</h2>
       </div>
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {testimonials.map((t, i) => (
           <motion.div
             key={t.name}
@@ -157,7 +157,7 @@ export function Pricing() {
         <p className="text-textSecondary">Start free. Upgrade when you're ready to launch for real.</p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 items-start">
+      <div className="grid lg:grid-cols-3 gap-6 items-start max-w-xl lg:max-w-none mx-auto">
         {plans.map((p) => (
           <div
             key={p.name}
@@ -224,8 +224,8 @@ export function Footer() {
   ];
   return (
     <footer className="border-t border-border">
-      <div className="max-w-container mx-auto px-6 py-14 grid md:grid-cols-5 gap-10">
-        <div className="md:col-span-2">
+      <div className="max-w-container mx-auto px-6 py-14 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10">
+        <div className="col-span-2 sm:col-span-3 lg:col-span-2">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center font-bold text-white">C</div>
             <div>
