@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Download, Share2, Loader2, Sparkles, RefreshCw } from "lucide-react";
+import { Download, Share2, Loader2, Sparkles, RefreshCw, ChevronDown } from "lucide-react";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import WorkspaceHome from "./WorkspaceOverview";
 import OverviewTab from "./tabs/OverviewTab";
@@ -27,8 +27,6 @@ const tabs = [
   { key: "roadmap", label: "Roadmap" },
 ];
 
-// All 7 tabs now have real Gemini generators — show the "Run AI Analysis"
-// prompt for any of them if no report exists yet.
 const AI_TABS = ["validation", "competitors", "swot", "leancanvas", "mvp", "branding", "roadmap"];
 
 export default function Workspace() {
@@ -53,18 +51,19 @@ export default function Workspace() {
     setError("");
     Promise.all([
       projectsApi.get(id).then((res) => setProject(res.data)),
-      reportsApi
-        .get(id)
-        .then((res) => setReport(res.data))
-        .catch(() => setReport(null)), // no report yet is expected, not an error
+      reportsApi.get(id).then((res) => setReport(res.data)).catch(() => setReport(null)),
     ])
       .catch((err) => setError(err.message || "Could not load this project."))
       .finally(() => setLoading(false));
   }, [id]);
 
+  useEffect(() => { loadAll(); }, [loadAll]);
+
   useEffect(() => {
-    loadAll();
-  }, [loadAll]);
+    function close() { setExportOpen(false); }
+    if (exportOpen) document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, [exportOpen]);
 
   async function runAnalysis() {
     setAnalyzing(true);
@@ -83,19 +82,13 @@ export default function Workspace() {
     }
   }
 
-  useEffect(() => {
-    function close(e) { setExportOpen(false); }
-    if (exportOpen) document.addEventListener("click", close);
-    return () => document.removeEventListener("click", close);
-  }, [exportOpen]);
-
   if (active === "home") {
     return <WorkspaceHome onOpenTab={setActive} />;
   }
 
   if (loading) {
     return (
-      <DashboardLayout title="Loading..." subtitle="Fetching your startup workspace.">
+      <DashboardLayout title="Loading..." subtitle="Fetching workspace.">
         <div className="flex items-center justify-center gap-2 text-textSecondary py-24">
           <Loader2 size={18} className="animate-spin" /> Loading workspace...
         </div>
@@ -115,37 +108,58 @@ export default function Workspace() {
   const displaySubtitle = project?.tagline || project?.description || "";
   const displayScore = project?.startupScore ?? "—";
 
+  // ── Responsive action bar ──
+  // On mobile: icon-only for Share + Export, short label for Analyze
+  // On sm+: full text labels
   const action = (
-    <div className="flex items-center gap-2 relative">
-      <button className="border border-border hover:bg-surface2 transition-colors text-sm font-medium px-3.5 py-2 rounded-btn flex items-center gap-1.5">
-        <Share2 size={15} /> Share
+    <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+      {/* Share — icon-only on mobile */}
+      <button className="border border-border hover:bg-surface2 transition-colors p-2 sm:px-3.5 sm:py-2 rounded-btn flex items-center gap-1.5">
+        <Share2 size={15} />
+        <span className="hidden sm:inline text-sm font-medium">Share</span>
       </button>
+
+      {/* Run Analysis */}
       <button
         onClick={runAnalysis}
         disabled={analyzing}
-        className="bg-primary hover:bg-primaryHover transition-colors text-white text-sm font-medium px-3.5 py-2 rounded-btn flex items-center gap-1.5 disabled:opacity-60"
+        className="bg-primary hover:bg-primaryHover transition-colors text-white text-xs sm:text-sm font-medium px-2.5 sm:px-3.5 py-2 rounded-btn flex items-center gap-1.5 disabled:opacity-60 whitespace-nowrap"
       >
-        {analyzing ? <RefreshCw size={15} className="animate-spin" /> : <Sparkles size={15} />}
-        {analyzing ? "Analyzing..." : report ? "Run New Analysis" : "Run AI Analysis"}
+        {analyzing ? <RefreshCw size={14} className="animate-spin" /> : <Sparkles size={14} />}
+        <span className="hidden xs:inline">
+          {analyzing ? "Analyzing..." : report ? "Re-Analyze" : "Run AI"}
+        </span>
       </button>
+
+      {/* Export dropdown */}
       <div className="relative">
         <button
-          onClick={() => setExportOpen((v) => !v)}
+          onClick={(e) => { e.stopPropagation(); setExportOpen((v) => !v); }}
           disabled={!report}
-          className="border border-border hover:bg-surface2 transition-colors text-sm font-medium px-3.5 py-2 rounded-btn flex items-center gap-1.5 disabled:opacity-40"
+          className="border border-border hover:bg-surface2 transition-colors p-2 sm:px-3.5 sm:py-2 rounded-btn flex items-center gap-1.5 disabled:opacity-40"
         >
-          <Download size={15} /> Export
+          <Download size={15} />
+          <span className="hidden sm:inline text-sm font-medium">Export</span>
+          <ChevronDown size={13} className="hidden sm:inline" />
         </button>
         {exportOpen && (
-          <div className="absolute right-0 top-full mt-1.5 bg-surface border border-border rounded-card shadow-soft w-44 z-50 py-1 overflow-hidden">
+          <div className="absolute right-0 top-full mt-1.5 bg-surface border border-border rounded-card shadow-soft w-44 z-50 py-1">
             <button
-              onClick={() => { downloadMarkdown(project, report); setExportOpen(false); toast({ message: "Markdown exported!", type: "success" }); }}
+              onClick={() => {
+                downloadMarkdown(project, report);
+                setExportOpen(false);
+                toast({ message: "Markdown exported!", type: "success" });
+              }}
               className="w-full text-left px-4 py-2.5 text-sm hover:bg-surface2 transition-colors"
             >
               📄 Markdown (.md)
             </button>
             <button
-              onClick={() => { downloadPDF(project, report); setExportOpen(false); toast({ message: "PDF opened in print dialog!", type: "success" }); }}
+              onClick={() => {
+                downloadPDF(project, report);
+                setExportOpen(false);
+                toast({ message: "PDF opened in print dialog!", type: "success" });
+              }}
               className="w-full text-left px-4 py-2.5 text-sm hover:bg-surface2 transition-colors"
             >
               🖨️ PDF (Print)
@@ -160,17 +174,25 @@ export default function Workspace() {
 
   return (
     <DashboardLayout title={displayName} subtitle={displaySubtitle} action={action}>
-      <div className="flex items-center gap-2 mb-6">
-        <span className="text-xs font-medium bg-primary/15 text-primary px-3 py-1 rounded-full">Score {displayScore}</span>
-        {project?.industry && <span className="text-xs font-medium bg-surface2 text-textSecondary px-3 py-1 rounded-full">{project.industry}</span>}
+      {/* Score badges */}
+      <div className="flex flex-wrap items-center gap-2 mb-5">
+        <span className="text-xs font-medium bg-primary/15 text-primary px-3 py-1 rounded-full">
+          Score {displayScore}
+        </span>
+        {project?.industry && (
+          <span className="text-xs font-medium bg-surface2 text-textSecondary px-3 py-1 rounded-full">
+            {project.industry}
+          </span>
+        )}
       </div>
 
-      <div className="flex items-center gap-1 mb-6 border-b border-border overflow-x-auto">
+      {/* Tab bar — horizontally scrollable on mobile */}
+      <div className="flex items-center gap-0 mb-6 border-b border-border overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setActive(t.key)}
-            className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors
+            className={`px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium whitespace-nowrap border-b-2 transition-colors flex-shrink-0
             ${active === t.key ? "border-primary text-primary" : "border-transparent text-textSecondary hover:text-textPrimary"}`}
           >
             {t.label}
@@ -183,13 +205,13 @@ export default function Workspace() {
       )}
 
       {needsReport ? (
-        <div className="flex flex-col items-center justify-center text-center py-20 bg-surface2 border border-border rounded-card">
+        <div className="flex flex-col items-center justify-center text-center py-16 bg-surface2 border border-border rounded-card px-4">
           <div className="w-14 h-14 rounded-full bg-primary/15 text-primary flex items-center justify-center mb-4">
             <Sparkles size={24} />
           </div>
           <h3 className="text-lg font-semibold mb-1">No AI Analysis Yet</h3>
           <p className="text-textSecondary text-sm mb-6 max-w-sm">
-            Run the AI analysis to generate real validation, competitor, SWOT, lean canvas, and MVP insights for this startup.
+            Run the AI analysis to generate real validation, competitor, SWOT, lean canvas, and MVP insights.
           </p>
           <button
             onClick={runAnalysis}
