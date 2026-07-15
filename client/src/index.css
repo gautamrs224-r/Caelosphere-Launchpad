@@ -13,6 +13,7 @@ html, body {
   color: #FAFAFA;
   font-family: 'Inter', sans-serif;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 ::-webkit-scrollbar {
@@ -25,6 +26,15 @@ html, body {
 ::-webkit-scrollbar-thumb {
   background: #3F3F46;
   border-radius: 8px;
+}
+
+/* Hide scrollbar but keep scroll functionality — used on tab bars */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .bg-grid {
